@@ -17,7 +17,7 @@ scene = Scene(
         Sphere(
             center=numpy.array([10, 1, 0]),
             radius=3,
-            color=colors.GREEN
+            color=colors.RED
         )
     ]
 )

@@ -26,8 +26,6 @@ class Sphere(Shape):
         b = 2*numpy.dot(ray_dir, ray_pos - self.center)
         c = numpy.linalg.norm(ray_pos - self.center)**2 - self.radius**2
 
-        # import ipdb; ipdb.set_trace()
-
         # TODO: this really should by DRYed up.  Seems like we'd want a class
         # to handle building the intersection and the normal together and maybe
         # testing that d >= 0
@@ -45,18 +43,19 @@ class Sphere(Shape):
                 intersection = ray_pos + d*ray_dir
                 return intersection, self.build_surface_normal(intersection)
         else:
-            d1 = (-b + discriminant)/(2*a)
-            d2 = (-b - discriminant)/(2*a)
+            d1 = (-b + numpy.sqrt(discriminant))/(2*a)
+            d2 = (-b - numpy.sqrt(discriminant))/(2*a)
             best_d = None
             for potential_d in (d1, d2):
                 if potential_d < 0:
                     continue
                 else:
-                    # best_d = min(best_d or 0, potential_d)
                     best_d = potential_d if best_d is None else min(best_d, potential_d)
             if best_d is None:
                 return None, None
             intersection = ray_pos + best_d*ray_dir
+
+            dist_to_intersection = numpy.linalg.norm(ray_pos - intersection)
             return intersection, self.build_surface_normal(intersection)
 
     def build_surface_normal(self, intersection):
