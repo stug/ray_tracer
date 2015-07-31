@@ -4,8 +4,6 @@ import numpy
 
 
 class RayGenerator(object):
-    # Does this actually make sense as a name?
-    # Dry this up, probably
 
     def __init__(
         self,
@@ -35,4 +33,6 @@ class RayGenerator(object):
             for j in xrange(self.num_horizontal_steps):
                 horizontal_offset = horizontal_increment * (j - self.num_horizontal_steps/2)
                 vertical_offset = vertical_increment * (i - self.num_vertical_steps/2)
-                yield direction + horizontal_offset + vertical_offset
+                ray = direction + horizontal_offset + vertical_offset
+                pixel_coords = (i, j)
+                yield pixel_coords, ray
