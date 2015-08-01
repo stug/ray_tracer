@@ -34,11 +34,11 @@ class Sphere(Shape):
         # point in the opposite direction (if ray_pos is within the sphere)
         discriminant = b**2 - 4*a*c
         if discriminant < 0:
-            return None, None
+            return None
         elif discriminant == 0:
             d = -b/a
             if d < 0:
-                return None, None
+                return None
             else:
                 intersection = ray_pos + d*ray_dir
                 return intersection, self.build_surface_normal(intersection)
@@ -52,11 +52,11 @@ class Sphere(Shape):
                 else:
                     best_d = potential_d if best_d is None else min(best_d, potential_d)
             if best_d is None:
-                return None, None
+                return None
             intersection = ray_pos + best_d*ray_dir
 
             dist_to_intersection = numpy.linalg.norm(ray_pos - intersection)
-            return intersection, self.build_surface_normal(intersection)
+            return intersection
 
-    def build_surface_normal(self, intersection):
-        return intersection - self.center
+    def build_surface_normal_at_point(self, point):
+        return point - self.center

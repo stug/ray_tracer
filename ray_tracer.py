@@ -25,7 +25,7 @@ class RayTracer(object):
 
     def trace_scene(self):
         for (y, x), ray in self.ray_generator.yield_primary_rays(self.scene.direction):
-            pixel_color = self.scene.find_pixel_color_for_ray(ray)
+            pixel_color = self.scene.find_pixel_color_for_primary_ray(ray)
 
             # each pixel is actually 3 array elements
             # TODO: clean this up and maybe make it its own method
