@@ -15,14 +15,14 @@ class RayTracer(object):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.scene = scene
-        self.ray_generator = RayGenerator(self.screen_width, self.screen_height)
+        self.ray_generator = RayGenerator(self.scene.direction, self.screen_width, self.screen_height)
         self.screen = numpy.empty(
             [self.screen_height, self.screen_width*ARRAY_ELEMENTS_PER_PIXEL],
             dtype=int
         )
 
     def trace_scene(self):
-        for (y, x), ray in self.ray_generator.yield_primary_rays(self.scene.direction):
+        for (y, x), ray in self.ray_generator.yield_primary_rays():
             pixel_color = self.scene.find_pixel_color_for_primary_ray(ray)
 
             # each pixel is actually 3 array elements
