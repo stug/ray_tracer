@@ -30,15 +30,18 @@ class Scene(object):
         intersection, shape = self.find_closest_intersection_and_shape(ray, self.position)
         if not shape:
             return self.background_color
+        lambert_factor = 0
         for path in self.yield_paths_to_light_sources_from_point(intersection):
             dist_to_light = numpy.linalg.norm(path)
-            for obstruction, _ in self.yield_intersections_and_shapes(path, intersection):
-                dist_to_obstruction = numpy.linalg.norm(obstruction - intersection)
+            dir_to_light = path/dist_to_light
+            for obstruction_point, obstruction_shape in self.yield_intersections_and_shapes(path, intersection):
+                dist_to_obstruction = numpy.linalg.norm(obstruction_point - intersection)
                 if dist_to_obstruction <= dist_to_light:
-                    return BLACK
-            return shape.color
-        return BLACK  # eventually want shading
-
+                   surface_normal = shape.build_surface_normal_at_point(obstruction_point)
+                   lambert_contribution = numpy.dot(surface_normal, dir_to_light)
+                   lambert_factor += lambert_contribution
+        normalized_lambert_factor = min(lambert_factor, 1)
+        return shape.color * normalized_lambert_factor
 
     def find_closest_intersection_and_shape(self, ray, position):
         best_distance_to_intersection = None

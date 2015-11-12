@@ -61,4 +61,5 @@ class Sphere(Shape):
             return intersection
 
     def build_surface_normal_at_point(self, point):
-        return point - self.center
+        normal = point - self.center
+        return normal/numpy.linalg.norm(normal)
