@@ -25,9 +25,8 @@ scene = Scene(
     light_sources=[LightSource(numpy.array([9,-7,3]))]
 )
 
-tracer = RayTracer(scene, 200, 200)
-tracer.trace_scene()
 
-print tracer.screen
-
-tracer.dump_scene_to_png('test.png')
+if __name__ == '__main__':
+    tracer = RayTracer(scene, 200, 200)
+    tracer.trace_scene()
+    tracer.dump_scene_to_png('test.png')
