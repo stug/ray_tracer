@@ -1,5 +1,8 @@
 import numpy
 
+# to avoid floating point errors
+THRESHOLD_INTERSECTION_DISTANCE = 1e-10
+
 
 class Shape(object):
 
@@ -15,7 +18,7 @@ class Sphere(Shape):
         self.radius = radius
         self.color = color
 
-    def find_intersection_and_normal(self, ray_pos, ray_dir):
+    def find_intersection(self, ray_pos, ray_dir):
         """There will be an intersection if norm(ray_pos + d*ray_dir - center) = r
         for some value of d -- i.e. if we can construct a ray that passes at
         some point exactly r from the center of the circle.
@@ -47,7 +50,7 @@ class Sphere(Shape):
             d2 = (-b - numpy.sqrt(discriminant))/(2*a)
             best_d = None
             for potential_d in (d1, d2):
-                if potential_d < 0:
+                if potential_d < THRESHOLD_INTERSECTION_DISTANCE:
                     continue
                 else:
                     best_d = potential_d if best_d is None else min(best_d, potential_d)

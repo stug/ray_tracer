@@ -3,11 +3,6 @@ import numpy
 from colors import BLACK
 
 
-# Used to avoid floating point errors in calculating distance to obstructions
-# when determining when to render shadow.
-THRESHOLD_SHADING_DISTANCE = 1
-
-
 class Scene(object):
 
     def __init__(
@@ -35,20 +30,13 @@ class Scene(object):
         intersection, shape = self.find_closest_intersection_and_shape(ray, self.position)
         if not shape:
             return self.background_color
-        # import ipdb; ipdb.set_trace()
         for path in self.yield_paths_to_light_sources_from_point(intersection):
             dist_to_light = numpy.linalg.norm(path)
-            unobstructed = True  # TODO: better way to do this?  pretty ugly.
             for obstruction, _ in self.yield_intersections_and_shapes(path, intersection):
-                unobstructed = False
-                dist_to_obstruction = numpy.linalg.norm(obstruction)
-                if (
-                    dist_to_light <= dist_to_obstruction
-                    or dist_to_obstruction < THRESHOLD_SHADING_DISTANCE
-                ):
-                    return shape.color
-            if unobstructed:
-                return shape.color
+                dist_to_obstruction = numpy.linalg.norm(obstruction - intersection)
+                if dist_to_obstruction <= dist_to_light:
+                    return BLACK
+            return shape.color
         return BLACK  # eventually want shading
 
 
@@ -67,10 +55,7 @@ class Scene(object):
 
     def yield_intersections_and_shapes(self, ray, position):
         for shape in self.shapes:
-            intersection = shape.find_intersection_and_normal(
-                position,
-                ray
-            )
+            intersection = shape.find_intersection(position, ray)
             if intersection is not None:
                 yield intersection, shape
 
