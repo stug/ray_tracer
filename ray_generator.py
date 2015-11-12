@@ -22,7 +22,7 @@ class RayGenerator(object):
         print self.horizontal_step_size
 
     def yield_primary_rays(self, direction):
-        # TODO: actually implement this 
+        # TODO: actually allow any direction.
         direction = numpy.array([1,0,0])
 
         # make sure direction is a unit vector

@@ -5,8 +5,6 @@ from ray_generator import RayGenerator
 from shapes import Sphere
 
 
-BACKGROUND_COLOR = numpy.array([0,0,0])  # black
-
 ARRAY_ELEMENTS_PER_PIXEL = 3  # because of r,g,b
 
 
@@ -29,6 +27,7 @@ class RayTracer(object):
 
             # each pixel is actually 3 array elements
             # TODO: clean this up and maybe make it its own method
+            # TODO: or better, make a screen class that abstracts this away
             min_x = ARRAY_ELEMENTS_PER_PIXEL*x
             max_x = ARRAY_ELEMENTS_PER_PIXEL*(x+1)
             self.screen[y][min_x:max_x] = pixel_color

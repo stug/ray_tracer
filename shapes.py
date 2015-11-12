@@ -53,9 +53,8 @@ class Sphere(Shape):
                     best_d = potential_d if best_d is None else min(best_d, potential_d)
             if best_d is None:
                 return None
-            intersection = ray_pos + best_d*ray_dir
 
-            dist_to_intersection = numpy.linalg.norm(ray_pos - intersection)
+            intersection = ray_pos + best_d*ray_dir
             return intersection
 
     def build_surface_normal_at_point(self, point):
