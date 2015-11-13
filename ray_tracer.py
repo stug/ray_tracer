@@ -12,6 +12,7 @@ class RayTracer(object):
 
     def __init__(self, scene, screen_width=100, screen_height=100):
         # eventually we should load a scene from a config file
+        # although I guess the scene itself should handle that
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.scene = scene
