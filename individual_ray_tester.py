@@ -14,9 +14,9 @@ class IndividualRayTester(object):
 
     def get_color_for_pixel(self, pixel_x, pixel_y):
         ray = self.ray_generator.create_ray_for_step_numbers(pixel_y, pixel_x)
-        return self.scene.find_pixel_color_for_primary_ray(ray)
+        return self.scene.find_pixel_color_for_ray(ray, self.scene.position)
 
 
 if __name__ == '__main__':
-    tester = IndividualRayTester(test_scene, 200, 200)
+    tester = IndividualRayTester(test_scene, 400, 400)
     print tester.get_color_for_pixel(int(sys.argv[1]), int(sys.argv[2]))
