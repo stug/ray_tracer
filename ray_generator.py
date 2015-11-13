@@ -21,8 +21,8 @@ class RayGenerator(object):
         self.num_vertical_steps = num_vertical_steps
         self.num_horizontal_steps = num_horizontal_steps
 
-        vertical_step_size = 2*math.sin(vert_fov_angle)/self.num_vertical_steps
-        horizontal_step_size = 2*math.sin(horiz_fov_angle)/self.num_horizontal_steps
+        vertical_step_size = math.sin(vert_fov_angle)/self.num_vertical_steps
+        horizontal_step_size = math.sin(horiz_fov_angle)/self.num_horizontal_steps
 
         # make sure direction is a unit vector and then find right and up vectors
         direction = normalize(direction)
