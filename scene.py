@@ -64,6 +64,10 @@ class Scene(object):
         return specularized_color
 
     def is_path_obstructed(self, ray, position):
+        """Determine if there are any objects along ray starting from position.
+        Note that ray describes the entire path, not just the direction of the
+        path, so the obstruction must occur along the length of the ray.
+        """
         path_length = numpy.linalg.norm(ray)
         for obstruction_point, _ in self.yield_intersections_and_shapes(ray, position):
             dist_to_obstruction = numpy.linalg.norm(obstruction_point - position)
