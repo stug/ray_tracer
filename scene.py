@@ -26,22 +26,49 @@ class Scene(object):
         self.light_sources.append(light_source)
 
     # TODO: make a ray class to encapsulate pos + dir?
-    def find_pixel_color_for_primary_ray(self, ray):
-        intersection, shape = self.find_closest_intersection_and_shape(ray, self.position)
+    def find_pixel_color_for_ray(self, ray, position, depth=3):
+        intersection, shape = self.find_closest_intersection_and_shape(ray, position)
         if not shape:
             return self.background_color
+        surface_normal = shape.build_surface_normal_at_point(intersection)
+
+        # lambert reflection
         lambert_factor = 0
         for path in self.yield_paths_to_light_sources_from_point(intersection):
             dist_to_light = numpy.linalg.norm(path)
             dir_to_light = path/dist_to_light
-            for obstruction_point, obstruction_shape in self.yield_intersections_and_shapes(path, intersection):
-                dist_to_obstruction = numpy.linalg.norm(obstruction_point - intersection)
-                if dist_to_obstruction <= dist_to_light:
-                   surface_normal = shape.build_surface_normal_at_point(obstruction_point)
-                   lambert_contribution = numpy.dot(surface_normal, dir_to_light)
-                   lambert_factor += lambert_contribution
+            if not self.is_path_obstructed(intersection, path):
+                lambert_contribution = numpy.dot(surface_normal, dir_to_light)
+                if lambert_contribution > 0:
+                    lambert_factor += lambert_contribution
         normalized_lambert_factor = min(lambert_factor, 1)
-        return shape.color * normalized_lambert_factor
+
+        shaded_color = shape.color * normalized_lambert_factor
+
+        # specular reflection
+        if depth == 0:
+            specular_contribution = numpy.array([0,0,0])
+        else:
+            incident_ray_normal = ray/numpy.linalg.norm(ray)
+            reflected_ray_normal = 2*surface_normal + incident_ray_normal
+            specular_contribution = self.find_pixel_color_for_ray(
+                reflected_ray_normal,
+                intersection,
+                depth-1
+            )
+
+        specularized_color = shaded_color + specular_contribution
+        for i, color_coord in enumerate(specularized_color):
+            specularized_color[i] = min(255, round(specularized_color[i]))
+        return specularized_color
+
+    def is_path_obstructed(self, ray, position):
+        path_length = numpy.linalg.norm(ray)
+        for obstruction_point, _ in self.yield_intersections_and_shapes(ray, position):
+            dist_to_obstruction = numpy.linalg.norm(obstruction_point - position)
+            if dist_to_obstruction <= path_length:
+                return True
+        return False
 
     def find_closest_intersection_and_shape(self, ray, position):
         best_distance_to_intersection = None
