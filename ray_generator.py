@@ -10,14 +10,16 @@ class RayGenerator(object):
         direction,
         num_vertical_steps,
         num_horizontal_steps,
-        horiz_fov_angle = math.pi/3.0,
-        vert_fov_angle = math.pi/3.0
+        horiz_fov_angle=math.pi/6.0,
+        vert_fov_angle=math.pi/6.0
     ):
         # TODO: actually allow any direction
         direction = numpy.array([1,0,0])
 
-        # make sure direction is a unit vector
-        self.direction = direction/numpy.linalg.norm(direction)
+        # make sure direction is a unit vector and then scale it so we get the
+        # correct FOV angle
+        # TODO: support non-square screen
+        self.direction = direction/numpy.linalg.norm(direction) * math.cos(vert_fov_angle)
         self.num_vertical_steps = num_vertical_steps
         self.num_horizontal_steps = num_horizontal_steps
 
