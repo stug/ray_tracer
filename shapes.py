@@ -6,17 +6,21 @@ THRESHOLD_INTERSECTION_DISTANCE = 1e-10
 
 class Shape(object):
 
-    def find_intersection_and_normal(self, ray_pos, ray_dir):
+    def find_intersection(self, ray_pos, ray_dir):
         """Should return a tuple of (intersection point, surface normal)"""
+        raise NotImplementedError
+
+    def build_surface_normal_at_point(self, point):
         raise NotImplementedError
 
 
 class Sphere(Shape):
 
-    def __init__(self, center, radius, color):
+    def __init__(self, center, radius, color, specular=0):
         self.center = center
         self.radius = radius
         self.color = color
+        self.specular = specular
 
     def find_intersection(self, ray_pos, ray_dir):
         """There will be an intersection if norm(ray_pos + d*ray_dir - center) = r

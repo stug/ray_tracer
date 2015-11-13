@@ -46,18 +46,19 @@ class Scene(object):
         shaded_color = shape.color * normalized_lambert_factor
 
         # specular reflection
-        if depth == 0:
+        if not shape.specular or depth == 0:
             specular_contribution = numpy.array([0,0,0])
         else:
             incident_ray_normal = ray/numpy.linalg.norm(ray)
             reflected_ray_normal = 2*surface_normal + incident_ray_normal
-            specular_contribution = self.find_pixel_color_for_ray(
+            specular_contribution = shape.specular * self.find_pixel_color_for_ray(
                 reflected_ray_normal,
                 intersection,
                 depth-1
             )
 
         specularized_color = shaded_color + specular_contribution
+        # TODO: fix this or at least factor out into a method
         for i, color_coord in enumerate(specularized_color):
             specularized_color[i] = min(255, round(specularized_color[i]))
         return specularized_color
