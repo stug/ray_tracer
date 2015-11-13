@@ -1,6 +1,7 @@
 import numpy
 
 from colors import BLACK
+from util import normalize
 
 
 class Scene(object):
@@ -49,7 +50,7 @@ class Scene(object):
         if not shape.specular or depth == 0:
             specular_contribution = numpy.array([0,0,0])
         else:
-            incident_ray_normal = ray/numpy.linalg.norm(ray)
+            incident_ray_normal = normalize(ray)
             reflected_ray_normal = 2*surface_normal + incident_ray_normal
             specular_contribution = shape.specular * self.find_pixel_color_for_ray(
                 reflected_ray_normal,

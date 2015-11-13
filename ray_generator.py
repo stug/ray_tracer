@@ -2,6 +2,11 @@ import math
 
 import numpy
 
+from util import normalize
+
+
+Z_UNIT_VECTOR = numpy.array([0,0,1])
+
 
 class RayGenerator(object):
 
@@ -13,20 +18,26 @@ class RayGenerator(object):
         horiz_fov_angle=math.pi/6.0,
         vert_fov_angle=math.pi/6.0
     ):
-        # TODO: actually allow any direction
-        direction = numpy.array([1,0,0])
-
-        # make sure direction is a unit vector and then scale it so we get the
-        # correct FOV angle
-        # TODO: support non-square screen
-        self.direction = direction/numpy.linalg.norm(direction) * math.cos(vert_fov_angle)
         self.num_vertical_steps = num_vertical_steps
         self.num_horizontal_steps = num_horizontal_steps
 
         vertical_step_size = 2*math.sin(vert_fov_angle)/self.num_vertical_steps
         horizontal_step_size = 2*math.sin(horiz_fov_angle)/self.num_horizontal_steps
-        self.horizontal_increment = numpy.array([0,1,0]) * horizontal_step_size
-        self.vertical_increment = numpy.array([0,0,1]) * vertical_step_size
+
+        # make sure direction is a unit vector and then find right and up vectors
+        direction = normalize(direction)
+        right_vector, up_vector = self.find_right_and_up_vectors(direction)
+
+        self.horizontal_increment = right_vector * horizontal_step_size
+        self.vertical_increment = up_vector * vertical_step_size
+
+        # TODO: support non-square screen
+        self.direction = direction * math.cos(vert_fov_angle)
+
+    def find_right_and_up_vectors(self, direction_unit_vector):
+        right_unit_vector = numpy.cross(direction_unit_vector, Z_UNIT_VECTOR)
+        up_unit_vector = numpy.cross(right_unit_vector, direction_unit_vector)
+        return right_unit_vector, up_unit_vector
 
     def yield_primary_rays(self):
         # Note that this does not return unit vectors

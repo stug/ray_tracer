@@ -1,5 +1,7 @@
 import numpy
 
+from util import normalize
+
 # to avoid floating point errors
 THRESHOLD_INTERSECTION_DISTANCE = 1e-10
 
@@ -65,5 +67,4 @@ class Sphere(Shape):
             return intersection
 
     def build_surface_normal_at_point(self, point):
-        normal = point - self.center
-        return normal/numpy.linalg.norm(normal)
+        return normalize(point - self.center)
