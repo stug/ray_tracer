@@ -1,5 +1,3 @@
-import math
-
 import numpy
 
 from util import normalize
@@ -15,14 +13,14 @@ class RayGenerator(object):
         direction,
         num_vertical_steps,
         num_horizontal_steps,
-        horiz_fov_angle=math.pi/6.0,
-        vert_fov_angle=math.pi/6.0
+        horiz_fov_angle=numpy.pi/6.0,
+        vert_fov_angle=numpy.pi/6.0
     ):
         self.num_vertical_steps = num_vertical_steps
         self.num_horizontal_steps = num_horizontal_steps
 
-        vertical_step_size = 2*math.sin(vert_fov_angle/2)/self.num_vertical_steps
-        horizontal_step_size = 2*math.sin(horiz_fov_angle/2)/self.num_horizontal_steps
+        vertical_step_size = 2*numpy.sin(vert_fov_angle/2)/self.num_vertical_steps
+        horizontal_step_size = 2*numpy.sin(horiz_fov_angle/2)/self.num_horizontal_steps
 
         # make sure direction is a unit vector and then find right and up vectors
         direction = normalize(direction)
@@ -34,7 +32,7 @@ class RayGenerator(object):
         # TODO: support non-square screen (keep d as a unit vector and set
         # step size = 2*d*tan(fov_angle/2).  But unclear how strictly to tie
         # screen aspect ratio to fov angle ratio
-        self.direction = direction * math.cos(vert_fov_angle)
+        self.direction = direction * numpy.cos(vert_fov_angle)
 
     def find_right_and_up_vectors(self, direction_unit_vector):
         right_unit_vector = numpy.cross(direction_unit_vector, Z_UNIT_VECTOR)
