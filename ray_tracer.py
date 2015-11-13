@@ -22,18 +22,23 @@ class RayTracer(object):
         )
 
     def trace_scene(self):
-        for (y, x), ray in self.ray_generator.yield_primary_rays():
+        for (x, y), ray in self.ray_generator.yield_primary_rays():
             pixel_color = self.scene.find_pixel_color_for_ray(
                 ray,
                 self.scene.position
             )
+
+            # because computer graphics usually starts with increasing y moving
+            # downward in the image, need to transform the world coordinates to
+            # screen coordinates
+            screen_y = self.screen_height - y - 1
 
             # each pixel is actually 3 array elements
             # TODO: clean this up and maybe make it its own method
             # TODO: or better, make a screen class that abstracts this away
             min_x = ARRAY_ELEMENTS_PER_PIXEL*x
             max_x = ARRAY_ELEMENTS_PER_PIXEL*(x+1)
-            self.screen[y][min_x:max_x] = pixel_color
+            self.screen[screen_y][min_x:max_x] = pixel_color
 
     def dump_scene_to_png(self, filename):
         png_writer = png.Writer(self.screen_width, self.screen_height)

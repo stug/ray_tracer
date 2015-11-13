@@ -27,13 +27,13 @@ class RayGenerator(object):
         self.vertical_increment = numpy.array([0,0,1]) * vertical_step_size
 
     def yield_primary_rays(self):
-        # this won't yield unit vectors -- problem?
-        for i in xrange(self.num_vertical_steps):
-            for j in xrange(self.num_horizontal_steps):
-                pixel_coords = (i, j)
-                yield pixel_coords, self.create_ray_for_step_numbers(i, j)
+        # Note that this does not return unit vectors
+        for i in xrange(self.num_horizontal_steps):
+            for j in xrange(self.num_vertical_steps):
+                coords = (i, j)
+                yield coords, self.create_ray_for_step_numbers(i, j)
 
-    def create_ray_for_step_numbers(self, vertical_step_number, horizontal_step_number):
-        vertical_offset = self.vertical_increment * (vertical_step_number - self.num_vertical_steps/2)
+    def create_ray_for_step_numbers(self, horizontal_step_number, vertical_step_number):
         horizontal_offset = self.horizontal_increment * (horizontal_step_number - self.num_horizontal_steps/2)
+        vertical_offset = self.vertical_increment * (vertical_step_number - self.num_vertical_steps/2)
         return self.direction + horizontal_offset + vertical_offset
