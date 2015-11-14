@@ -89,7 +89,7 @@ class ZPlane(Shape):
             else:
                 return None
         d = (self.z_coord - ray_pos[2])/ray_dir[2]
-        return ray_pos + d*ray_dir if d > 0 else None
+        return ray_pos + d*ray_dir if d > THRESHOLD_INTERSECTION_DISTANCE else None
 
     def build_surface_normal_at_point(self, point):
         # TODO: should return normalize(dot(Z_UNIT_VECTOR, incoming_ray))
