@@ -82,7 +82,7 @@ class Scene(object):
         closest_intersection = None
         closest_shape = None
         for intersection, shape in self.yield_intersections_and_shapes(ray, position):
-            distance_to_intersection = numpy.linalg.norm(intersection - self.position)
+            distance_to_intersection = numpy.linalg.norm(intersection - position)
             if best_distance_to_intersection is None or distance_to_intersection < best_distance_to_intersection:
                 best_distance_to_intersection = distance_to_intersection
                 closest_intersection = intersection
