@@ -50,7 +50,6 @@ class RayGenerator(object):
         vertical_offset = self.vertical_increment * (vertical_step_number - self.num_vertical_steps/2)
         return self.direction + horizontal_offset + vertical_offset
 
-    @classmethod
-    def maybe_log_progress(cls, column_number):
-        if column_number % 50 == 0:
-            print 'Column %s' % column_number
+    def maybe_log_progress(self, column_number):
+        if column_number % (self.num_horizontal_steps/10) == 0:
+            print '%d percent' % round(100.0*column_number/self.num_horizontal_steps)
