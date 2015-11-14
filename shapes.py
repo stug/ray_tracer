@@ -1,5 +1,6 @@
 import numpy
 
+import colors
 from util import normalize
 from util import Z_UNIT_VECTOR
 
@@ -16,6 +17,9 @@ class Shape(object):
 
     def build_surface_normal_at_point(self, point):
         raise NotImplementedError
+
+    def get_color_at_point(self, point):
+        return self.color
 
 
 class Sphere(Shape):
@@ -74,9 +78,10 @@ class Sphere(Shape):
 
 class ZPlane(Shape):
 
-    def __init__(self, z_coord, color, specular=0):
+    def __init__(self, z_coord, color, checkered=False, specular=0):
         self.z_coord = z_coord
         self.color = color
+        self.checkered=checkered
         self.specular = specular
 
     def find_intersection(self, ray_pos, ray_dir):
@@ -93,4 +98,16 @@ class ZPlane(Shape):
 
     def build_surface_normal_at_point(self, point):
         # TODO: should return normalize(dot(Z_UNIT_VECTOR, incoming_ray))
+        # to handle case where we intersect from below
         return Z_UNIT_VECTOR
+
+    def get_color_at_point(self, point):
+        # TODO: probably should implement a pattern class for this sort of thing?
+        if not self.checkered:
+            return self.color
+        even_x_coord = numpy.floor(point[0]) % 2 == 0
+        even_y_coord = numpy.floor(point[1]) % 2 == 0
+        if even_x_coord == even_y_coord:
+            return self.color
+        else:
+            return colors.BLACK

@@ -44,7 +44,7 @@ class Scene(object):
                     lambert_factor += lambert_contribution
         normalized_lambert_factor = min(lambert_factor, 1)
 
-        shaded_color = shape.color * normalized_lambert_factor
+        shaded_color = shape.get_color_at_point(intersection) * normalized_lambert_factor
 
         # specular reflection
         if not shape.specular or depth == 0:
