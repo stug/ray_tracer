@@ -1,9 +1,7 @@
 import numpy
 
 from util import normalize
-
-
-Z_UNIT_VECTOR = numpy.array([0,0,1])
+from util import Z_UNIT_VECTOR
 
 
 class RayGenerator(object):
