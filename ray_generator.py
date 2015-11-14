@@ -40,6 +40,7 @@ class RayGenerator(object):
     def yield_primary_rays(self):
         # Note that this does not return unit vectors
         for i in xrange(self.num_horizontal_steps):
+            self.maybe_log_progress(i)
             for j in xrange(self.num_vertical_steps):
                 coords = (i, j)
                 yield coords, self.create_ray_for_step_numbers(i, j)
@@ -48,3 +49,8 @@ class RayGenerator(object):
         horizontal_offset = self.horizontal_increment * (horizontal_step_number - self.num_horizontal_steps/2)
         vertical_offset = self.vertical_increment * (vertical_step_number - self.num_vertical_steps/2)
         return self.direction + horizontal_offset + vertical_offset
+
+    @classmethod
+    def maybe_log_progress(cls, column_number):
+        if column_number % 50 == 0:
+            print 'Column %s' % column_number
