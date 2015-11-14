@@ -78,6 +78,7 @@ class Sphere(Shape):
 
 class ZPlane(Shape):
 
+    # TODO: generalize this to allow any orientation
     def __init__(self, z_coord, color, checkered=False, specular=0):
         self.z_coord = z_coord
         self.color = color
