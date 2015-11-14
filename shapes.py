@@ -1,6 +1,8 @@
 import numpy
 
 from util import normalize
+from util import Z_UNIT_VECTOR
+
 
 # to avoid floating point errors
 THRESHOLD_INTERSECTION_DISTANCE = 1e-10
@@ -68,3 +70,27 @@ class Sphere(Shape):
 
     def build_surface_normal_at_point(self, point):
         return normalize(point - self.center)
+
+
+class ZPlane(Shape):
+
+    def __init__(self, z_coord, color, specular=0):
+        self.z_coord = z_coord
+        self.color = color
+        self.specular = specular
+
+    def find_intersection(self, ray_pos, ray_dir):
+        """Intersection if ray_pos.z + d*ray_dir.z = z_coord"""
+        # If the incoming ray has a z coordinate of 0, then either the ray
+        # started within the plane, or it will never intersect it.
+        if ray_dir[2] == 0:
+            if ray_pos[2] == self.z_coord:
+                return ray_pos
+            else:
+                return None
+        d = (self.z_coord - ray_pos[2])/ray_dir[2]
+        return ray_pos + d*ray_dir if d > 0 else None
+
+    def build_surface_normal_at_point(self, point):
+        # TODO: should return normalize(dot(Z_UNIT_VECTOR, incoming_ray))
+        return Z_UNIT_VECTOR
