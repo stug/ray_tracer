@@ -15,7 +15,7 @@ class Shape(object):
         """Should return a tuple of (intersection point, surface normal)"""
         raise NotImplementedError
 
-    def build_surface_normal_at_point(self, point):
+    def build_surface_normal_at_point_for_ray(self, point, ray):
         raise NotImplementedError
 
     def get_color_at_point(self, point):
@@ -72,8 +72,11 @@ class Sphere(Shape):
             intersection = ray_pos + best_d*ray_dir
             return intersection
 
-    def build_surface_normal_at_point(self, point):
-        return normalize(point - self.center)
+    def build_surface_normal_at_point_for_ray(self, point, ray):
+        # Surface normal should point in the opposite direction of the incoming
+        # ray
+        base_surface_normal = normalize(point - self.center)
+        return -1*numpy.sign(numpy.dot(base_surface_normal, ray)) * base_surface_normal
 
 
 class ZPlane(Shape):
@@ -97,10 +100,10 @@ class ZPlane(Shape):
         d = (self.z_coord - ray_pos[2])/ray_dir[2]
         return ray_pos + d*ray_dir if d > THRESHOLD_INTERSECTION_DISTANCE else None
 
-    def build_surface_normal_at_point(self, point):
-        # TODO: should return normalize(dot(Z_UNIT_VECTOR, incoming_ray))
-        # to handle case where we intersect from below
-        return Z_UNIT_VECTOR
+    def build_surface_normal_at_point_for_ray(self, point, ray):
+        # Surface normal is the z unit vector pointing in the opposite direciton
+        # of the incoming ray
+        return -1*numpy.sign(numpy.dot(Z_UNIT_VECTOR, ray)) * Z_UNIT_VECTOR
 
     def get_color_at_point(self, point):
         # TODO: probably should implement a pattern class for this sort of thing?

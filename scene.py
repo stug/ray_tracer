@@ -27,11 +27,12 @@ class Scene(object):
         self.light_sources.append(light_source)
 
     # TODO: make a ray class to encapsulate pos + dir?
+    # TODO: clean this up!
     def find_pixel_color_for_ray(self, ray, position, depth=3):
         intersection, shape = self.find_closest_intersection_and_shape(ray, position)
         if not shape:
             return self.background_color
-        surface_normal = shape.build_surface_normal_at_point(intersection)
+        surface_normal = shape.build_surface_normal_at_point_for_ray(intersection, ray)
 
         # lambert reflection
         lambert_factor = 0
