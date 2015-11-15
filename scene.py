@@ -40,14 +40,17 @@ class Scene(object):
         # lambert reflection
         lambert_factor = 0
         for path in self.yield_paths_to_light_sources_from_point(intersection):
-            dist_to_light = numpy.linalg.norm(path)
-            dir_to_light = path/dist_to_light
+            path_normal = normalize(path)
             if not self.is_path_obstructed(intersection, path):
-                lambert_contribution = numpy.dot(surface_normal, dir_to_light)
+                lambert_contribution = numpy.dot(surface_normal, path_normal)
                 if lambert_contribution > 0:
                     lambert_factor += lambert_contribution
         normalized_lambert_factor = min(lambert_factor, 1)
-        shaded_color = shape.get_color_at_point(intersection) * normalized_lambert_factor
+        shaded_color = (
+            shape.get_color_at_point(intersection) *
+            normalized_lambert_factor *
+            (1 - shape.transparency)
+        )
 
         # specular reflection
         if not shape.specular or depth == 0:
@@ -74,9 +77,13 @@ class Scene(object):
                 n2 = shape.index_of_refraction
             cos_incident = -1*numpy.dot(incident_ray_normal, surface_normal)
             sin_incident = numpy.sqrt(1 - cos_incident**2)
-            cos_refracted = numpy.sqrt(1 - (n1*sin_incident/n2)**2)
-            a = cos_incident - cos_refracted
-            refracted_ray_normal = normalize(a*surface_normal + incident_ray_normal)
+            sin_refracted = n1*sin_incident/n2
+            if sin_refracted > 1:
+                refracted_ray_normal = 2*surface_normal + incident_ray_normal
+            else:
+                cos_refracted = numpy.sqrt(1 - sin_refracted**2)
+                a = cos_incident - cos_refracted
+                refracted_ray_normal = normalize(a*surface_normal + incident_ray_normal)
             refraction_contribution = shape.transparency * self.find_pixel_color_for_ray(
                 refracted_ray_normal,
                 intersection,
