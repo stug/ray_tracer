@@ -99,9 +99,3 @@ class Scene(object):
     def yield_paths_to_light_sources_from_point(self, point):
         for light_source in self.light_sources:
             yield light_source.position - point
-
-
-class LightSource(object):
-
-    def __init__(self, position):
-        self.position = position

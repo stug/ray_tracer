@@ -122,3 +122,9 @@ class ZPlane(Shape):
             return self.color
         else:
             return colors.BLACK
+
+
+class LightSource(object):
+
+    def __init__(self, position):
+        self.position = position

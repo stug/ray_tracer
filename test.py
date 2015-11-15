@@ -2,8 +2,8 @@ import numpy
 
 import colors
 from ray_tracer import RayTracer
-from scene import LightSource
 from scene import Scene
+from shapes import LightSource
 from shapes import Sphere
 from shapes import ZPlane
 
@@ -85,6 +85,6 @@ scene2 = Scene(
 
 
 if __name__ == '__main__':
-    tracer = RayTracer(scene2, 300, 300)
+    tracer = RayTracer(scene1, 900, 900)
     tracer.trace_scene()
     tracer.dump_scene_to_png('test.png')
