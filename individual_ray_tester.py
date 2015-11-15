@@ -2,7 +2,7 @@ import sys
 
 from ray_generator import RayGenerator
 from ray_tracer import RayTracer
-from test import scene as test_scene
+import test
 
 
 class IndividualRayTester(object):
@@ -19,5 +19,5 @@ class IndividualRayTester(object):
 
 
 if __name__ == '__main__':
-    tester = IndividualRayTester(test_scene, 300, 300)
+    tester = IndividualRayTester(test.transparency_test, 900, 900)
     print tester.get_color_for_pixel(int(sys.argv[1]), int(sys.argv[2]))

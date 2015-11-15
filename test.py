@@ -2,8 +2,8 @@ import numpy
 
 import colors
 from ray_tracer import RayTracer
-from scene import LightSource
 from scene import Scene
+from shapes import LightSource
 from shapes import Sphere
 from shapes import ZPlane
 
@@ -22,7 +22,9 @@ scene1 = Scene(
             center=numpy.array([10, 2, 0]),
             radius=3,
             color=colors.RED,
-            specular=0.8
+            specular=0.2,
+            transparency=1,
+            index_of_refraction=1.5
         ),
         Sphere(
             center=numpy.array([5,0,3]),
@@ -54,37 +56,33 @@ scene1 = Scene(
     ]
 )
 
-scene2 = Scene(
+
+transparency_test = Scene(
     position=numpy.array([0,0,0]),
     direction=numpy.array([1,0,0]),
-    background_color=colors.BLACK,
+    background_color=colors.CYAN,
     shapes=[
         Sphere(
-            center=numpy.array([0,0,0]),
-            radius=10,
-            color=colors.GREY_50,
-            specular=0.9
-        ),
-        Sphere(
-            center=numpy.array([4,1,1]),
-            radius=0.5,
+            center=numpy.array([15,2,-3]),
+            radius=1,
             color=colors.RED,
+            transparency=1,
+            index_of_refraction=1.5,
             specular=0.5
         ),
         ZPlane(
-            z_coord=-2,
+            z_coord=-4,
             color=colors.WHITE,
             checkered=True,
-            specular=0
         )
     ],
     light_sources=[
-        LightSource(numpy.array([0,-7,0])),
+        LightSource(numpy.array([0,0,0]))
     ]
 )
 
 
 if __name__ == '__main__':
-    tracer = RayTracer(scene2, 300, 300)
+    tracer = RayTracer(scene1, 900, 900)
     tracer.trace_scene()
     tracer.dump_scene_to_png('test.png')
