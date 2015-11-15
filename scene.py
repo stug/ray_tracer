@@ -33,6 +33,9 @@ class Scene(object):
         if not shape:
             return self.background_color
         surface_normal = shape.build_surface_normal_at_point_for_ray(intersection, ray)
+        # TODO: really need to keep both this and the original ray?  Probably
+        # not.
+        incident_ray_normal = normalize(ray)
 
         # lambert reflection
         lambert_factor = 0
@@ -44,26 +47,48 @@ class Scene(object):
                 if lambert_contribution > 0:
                     lambert_factor += lambert_contribution
         normalized_lambert_factor = min(lambert_factor, 1)
-
         shaded_color = shape.get_color_at_point(intersection) * normalized_lambert_factor
 
         # specular reflection
         if not shape.specular or depth == 0:
             specular_contribution = numpy.array([0,0,0])
         else:
-            incident_ray_normal = normalize(ray)
             reflected_ray_normal = 2*surface_normal + incident_ray_normal
             specular_contribution = shape.specular * self.find_pixel_color_for_ray(
                 reflected_ray_normal,
                 intersection,
                 depth-1
             )
-
         specularized_color = shaded_color + specular_contribution
+
+        # Snell's law says sin(incident_angle)/sin(refreacted_angle) =
+        # (index_of_refraction1)/(index_of_refraction)
+        if not shape.transparency or depth == 0:
+            refraction_contribution = numpy.array([0,0,0])
+        else:
+            if shape.ray_originates_inside(intersection, ray):
+                n1 = shape.index_of_refraction
+                n2 = 1  # for now only allowing refraction with air and shape
+            else:
+                n1 = 1
+                n2 = shape.index_of_refraction
+            cos_incident = -1*numpy.dot(incident_ray_normal, surface_normal)
+            sin_incident = numpy.sqrt(1 - cos_incident**2)
+            cos_refracted = numpy.sqrt(1 - (n1*sin_incident/n2)**2)
+            a = cos_incident - cos_refracted
+            refracted_ray_normal = normalize(a*surface_normal + incident_ray_normal)
+            refraction_contribution = shape.transparency * self.find_pixel_color_for_ray(
+                refracted_ray_normal,
+                intersection,
+                depth-1
+            )
+
+        pixel_color = shaded_color + specular_contribution + refraction_contribution
+
         # TODO: fix this or at least factor out into a method
-        for i, color_coord in enumerate(specularized_color):
-            specularized_color[i] = min(255, round(specularized_color[i]))
-        return specularized_color
+        for i, color_coord in enumerate(pixel_color):
+            pixel_color[i] = min(255, round(pixel_color[i]))
+        return pixel_color
 
     def is_path_obstructed(self, ray, position):
         """Determine if there are any objects along ray starting from position.

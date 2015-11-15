@@ -54,37 +54,33 @@ scene1 = Scene(
     ]
 )
 
-scene2 = Scene(
+
+transparency_test = Scene(
     position=numpy.array([0,0,0]),
     direction=numpy.array([1,0,0]),
-    background_color=colors.BLACK,
+    background_color=colors.CYAN,
     shapes=[
         Sphere(
-            center=numpy.array([0,0,0]),
-            radius=10,
-            color=colors.GREY_50,
-            specular=0.9
-        ),
-        Sphere(
-            center=numpy.array([4,1,1]),
-            radius=0.5,
+            center=numpy.array([15,0,0]),
+            radius=1,
             color=colors.RED,
-            specular=0.5
+            transparency=0.8,
+            index_of_refraction=1.5
+            #specular=0.2
         ),
         ZPlane(
-            z_coord=-2,
+            z_coord=-4,
             color=colors.WHITE,
             checkered=True,
-            specular=0
         )
     ],
     light_sources=[
-        LightSource(numpy.array([0,-7,0])),
+        LightSource(numpy.array([0,0,0]))
     ]
 )
 
 
 if __name__ == '__main__':
-    tracer = RayTracer(scene1, 900, 900)
+    tracer = RayTracer(transparency_test, 400, 400)
     tracer.trace_scene()
     tracer.dump_scene_to_png('test.png')

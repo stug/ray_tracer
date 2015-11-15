@@ -31,11 +31,13 @@ class Shape(object):
 
 class Sphere(Shape):
 
-    def __init__(self, center, radius, color, specular=0):
+    def __init__(self, center, radius, color, specular=0, transparency=0, index_of_refraction=1):
         self.center = center
         self.radius = radius
         self.color = color
         self.specular = specular
+        self.transparency = transparency
+        self.index_of_refraction = index_of_refraction
 
     def find_intersection(self, ray_pos, ray_dir):
         """There will be an intersection if norm(ray_pos + d*ray_dir - center) = r
@@ -85,15 +87,21 @@ class Sphere(Shape):
         base_surface_normal = normalize(point - self.center)
         return -1*numpy.sign(numpy.dot(base_surface_normal, ray)) * base_surface_normal
 
+    # TODO: this feels sloppy..
+    def ray_originates_inside(self, intersection_point, ray):
+        return numpy.dot(intersection_point - self.center, ray) > 0
+
 
 class ZPlane(Shape):
 
     # TODO: generalize this to allow any orientation
-    def __init__(self, z_coord, color, checkered=False, specular=0):
+    def __init__(self, z_coord, color, checkered=False, specular=0, transparency=0, index_of_refraction=1):
         self.z_coord = z_coord
         self.color = color
         self.checkered=checkered
         self.specular = specular
+        self.transparency = transparency
+        self.index_of_refraction = index_of_refraction
 
     def find_intersection(self, ray_pos, ray_dir):
         """Intersection if ray_pos.z + d*ray_dir.z = z_coord"""
@@ -122,6 +130,10 @@ class ZPlane(Shape):
             return self.color
         else:
             return colors.BLACK
+
+    def ray_originates_inside(self, ray):
+        # plane is 2-dimensional and has no inside
+        return False
 
 
 class LightSource(object):
