@@ -22,7 +22,9 @@ scene1 = Scene(
             center=numpy.array([10, 2, 0]),
             radius=3,
             color=colors.RED,
-            specular=0.8
+            specular=0.2,
+            transparency=1,
+            index_of_refraction=1.5
         ),
         Sphere(
             center=numpy.array([5,0,3]),
@@ -61,12 +63,12 @@ transparency_test = Scene(
     background_color=colors.CYAN,
     shapes=[
         Sphere(
-            center=numpy.array([15,0,0]),
+            center=numpy.array([15,2,-3]),
             radius=1,
             color=colors.RED,
-            transparency=0.8,
-            index_of_refraction=1.5
-            #specular=0.2
+            transparency=1,
+            index_of_refraction=1.5,
+            specular=0.5
         ),
         ZPlane(
             z_coord=-4,
@@ -81,6 +83,6 @@ transparency_test = Scene(
 
 
 if __name__ == '__main__':
-    tracer = RayTracer(transparency_test, 400, 400)
+    tracer = RayTracer(scene1, 900, 900)
     tracer.trace_scene()
     tracer.dump_scene_to_png('test.png')
