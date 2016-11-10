@@ -83,8 +83,8 @@ class Sphere(Shape):
         base_surface_normal = normalize(point - self.center)
         return -1*numpy.sign(numpy.dot(base_surface_normal, ray)) * base_surface_normal
 
-    # TODO: this feels sloppy..
     def ray_originates_inside(self, intersection_point, ray):
+        # Note that in this case, the ray ENDS at intersection point
         return numpy.dot(intersection_point - self.center, ray) > 0
 
 
