@@ -1,39 +1,14 @@
 import numpy
 import png
 
-from ray_generator import RayGenerator
-from screen import Screen
 from util import normalize
-
-
-ARRAY_ELEMENTS_PER_PIXEL = 3  # because of r,g,b
 
 
 class RayTracer(object):
 
-    def __init__(self, scene, screen_width=100, screen_height=100):
-        # eventually we should load a scene from a config file
-        # although I guess the scene itself should handle that
+    def __init__(self, scene):
         self.scene = scene
-        self.ray_generator = RayGenerator(
-            self.scene.direction,
-            screen_width,
-            screen_height
-        )
-        self.screen = Screen(screen_width, screen_height)
 
-    def dump_scene_to_png(self, filename):
-        self.screen.dump_to_png(filename)
-
-    def trace_scene(self):
-        for (x, y), ray in self.ray_generator.yield_primary_rays():
-            pixel_color = self.find_pixel_color_for_ray(
-                ray,
-                self.scene.position
-            )
-            self.screen.write_pixel(x, y, pixel_color)
-
-    # TODO: make a ray class to encapsulate pos + dir?
     def find_pixel_color_for_ray(self, ray, position, depth=3):
         intersection, shape = self.find_closest_intersection_and_shape(ray, position)
         if not shape:
