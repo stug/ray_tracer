@@ -12,10 +12,6 @@ THRESHOLD_INTERSECTION_DISTANCE = 1e-10
 # TODO: should standardize this interface more -- should guarantee that everything
 # has color, specular, and transparency defined...
 
-# TODO: implementation of transparency will require a notion of whether we are
-# inside of an object or not (to determine what to use for index of refraction)
-# Colored transparency will also require some way of allowing light to be lost
-# while it travels
 class Shape(object):
 
     def find_intersection(self, ray_pos, ray_dir):

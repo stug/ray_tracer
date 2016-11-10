@@ -7,7 +7,7 @@ from shapes import LightSource
 from shapes import Sphere
 from shapes import ZPlane
 
-scene1 = Scene(
+complex_scene = Scene(
     position=numpy.array([-13,0,0]),
     direction=numpy.array([1,0,0]),
     background_color=colors.BLACK,
@@ -60,13 +60,13 @@ scene1 = Scene(
 transparency_test = Scene(
     position=numpy.array([0,0,0]),
     direction=numpy.array([1,0,0]),
-    background_color=colors.CYAN,
+    background_color=colors.BLACK,
     shapes=[
         Sphere(
-            center=numpy.array([15,2,-3]),
-            radius=1,
-            color=colors.RED,
-            transparency=1,
+            center=numpy.array([15, 1, 0.5]),
+            radius=1.5,
+            color=colors.BLUE,
+            transparency=0.8,
             index_of_refraction=1.5,
             specular=0.5
         ),
@@ -83,6 +83,6 @@ transparency_test = Scene(
 
 
 if __name__ == '__main__':
-    tracer = RayTracer(scene1, 900, 900)
+    tracer = RayTracer(transparency_test, 300, 300)
     tracer.trace_scene()
     tracer.dump_scene_to_png('test.png')
