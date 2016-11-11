@@ -132,6 +132,40 @@ class ZPlane(Shape):
         return False
 
 
+class Plane(Shape):
+
+    def __init__(self, center, normal, color, specular=0, transparency=0):
+        self.center = center
+        self.normal = normal
+        self.color = color
+        self.specular = specular
+        self.transparency = transparency
+
+    def find_intersection(self, ray_pos, ray_dir):
+        """A plane is defined as all points p such that, for an arbitrary point
+        p0 in the plane and a normal vector n, dot(p-p0, n) = 0.  In this case,
+        p = ray_pos + d*ray_dir and so the intersection will occur when
+        d = dot(p0 - ray_pos, n)/dot(ray_dir, n).  dot(ray_dir, n) = 0 implies
+        that the ray and plane will never intersect.
+        """
+        # TODO: make this not a plane of unlimited extent...
+        denominator = numpy.dot(ray_dir, self.normal)
+        if denominator == 0:
+            return None
+
+        numerator = numpy.dot(self.center - ray_pos, self.normal)
+        d = numerator/denominator
+        return ray_pos + d*ray_dir if d > THRESHOLD_INTERSECTION_DISTANCE else None
+
+    def build_surface_normal_at_point_for_ray(self, point, ray):
+        # TODO: self.normal might not actually be a unit  vector
+        return -1*numpy.sign(numpy.dot(self.normal, ray)) * self.normal
+
+    def ray_originates_inside(self, ray):
+        # This is a 2-D object and has no inside
+        return False
+
+
 class LightSource(object):
 
     def __init__(self, position):
