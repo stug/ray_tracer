@@ -9,6 +9,7 @@ class IndividualRayTester(object):
     """Traces the ray associated to a single pixel as a debugging aid"""
 
     def __init__(self, scene, screen_width, screen_height):
+        self.scene = scene
         self.ray_generator = RayGenerator(scene.direction, screen_width, screen_height)
         self.ray_tracer = RayTracer(scene)
 
