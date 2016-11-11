@@ -2,6 +2,7 @@ import numpy
 
 
 Z_UNIT_VECTOR = numpy.array([0,0,1])
+X_UNIT_VECTOR = numpy.array([1,0,0])
 
 
 def normalize(vector):
