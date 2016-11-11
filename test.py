@@ -4,8 +4,8 @@ import colors
 from main import RayTracerMain
 from scene import Scene
 from shapes import LightSource
+from shapes import Plane
 from shapes import Sphere
-from shapes import ZPlane
 
 complex_scene = Scene(
     position=numpy.array([-13,0,0]),
@@ -44,11 +44,12 @@ complex_scene = Scene(
             color=colors.YELLOW,
             specular=0.8
         ),
-        ZPlane(
-            z_coord=-4,
+        Plane(
+            center=numpy.array([0,0,-4]),
+            normal=numpy.array([0,0,1]),
             color=colors.WHITE,
-            checkered=True,
-            specular=0.2
+            specular=0.2,
+            checkered=True
         )
     ],
     light_sources=[
@@ -70,10 +71,11 @@ transparency_test = Scene(
             index_of_refraction=1.5,
             specular=0.5
         ),
-        ZPlane(
-            z_coord=-4,
+        Plane(
+            center=numpy.array([0,0,-4]),
+            normal=numpy.array([0,0,1]),
             color=colors.WHITE,
-            checkered=True,
+            checkered=True
         )
     ],
     light_sources=[
@@ -82,7 +84,31 @@ transparency_test = Scene(
 )
 
 
+plane_test = Scene(
+    position=numpy.array([0,0,0]),
+    direction=numpy.array([1,0,0]),
+    background_color=colors.BLACK,
+    shapes=[
+        Sphere(
+            center=numpy.array([15,1,0.5]),
+            radius=2,
+            color=colors.BLACK,
+            specular=1,
+        ),
+        Plane(
+            center=numpy.array([0,-2,0]),
+            normal=numpy.array([0,1,0]),
+            color=colors.BLUE,
+            checkered=True
+        )
+    ],
+    light_sources=[
+        LightSource(numpy.array([15, 10, 0.5]))
+    ]
+)
+
+
 if __name__ == '__main__':
-    program = RayTracerMain(complex_scene, 700, 700)
+    program = RayTracerMain(complex_scene, 300, 300)
     program.trace_scene()
     program.export_png('test.png')
