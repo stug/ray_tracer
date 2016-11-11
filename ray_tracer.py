@@ -39,11 +39,11 @@ class RayTracer(object):
 
         # TODO: more physical way to combine these?
         pixel_color = lambert_shaded_color + specular_color + refraction_color
+        return self.normalize_pixel_intensity(pixel_color)
 
-        # TODO: fix this or at least factor out into a method
-        for i, color_coord in enumerate(pixel_color):
-            pixel_color[i] = min(255, round(pixel_color[i]))
-        return pixel_color
+    def normalize_pixel_intensity(self, pixel_color):
+        # TODO: is there a smarter way to do this?
+        return numpy.array([min(255, element) for element in pixel_color])
 
     def find_closest_intersection_and_shape(self, ray, position):
         best_distance_to_intersection = None
