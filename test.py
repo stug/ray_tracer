@@ -3,6 +3,7 @@ import numpy
 import colors
 from main import RayTracerMain
 from scene import Scene
+from shapes import AxisAlignedBox
 from shapes import LightSource
 from shapes import Plane
 from shapes import Sphere
@@ -108,7 +109,33 @@ plane_test = Scene(
 )
 
 
+box_test = Scene(
+    position=numpy.array([0,5,5]),
+    direction=numpy.array([15,-5,-5]),
+    background_color=colors.BLACK,
+    shapes=[
+        AxisAlignedBox(
+            center=numpy.array([15,0,0]),
+            x_extent=2,
+            y_extent=2,
+            z_extent=2,
+            color=colors.RED,
+            specular=0.5
+        ),
+        Plane(
+            center=numpy.array([0,0,-4]),
+            normal=numpy.array([0,0,1]),
+            color=colors.WHITE,
+            checkered=True
+        )
+    ],
+    light_sources=[
+        LightSource(numpy.array([0,0,0]))
+    ]
+)
+
+
 if __name__ == '__main__':
-    program = RayTracerMain(complex_scene, 300, 300)
+    program = RayTracerMain(box_test, 400, 400)
     program.trace_scene()
     program.export_png('test.png')
