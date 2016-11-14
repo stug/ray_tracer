@@ -7,7 +7,7 @@ from util import Z_UNIT_VECTOR
 
 
 # to avoid floating point errors
-THRESHOLD_INTERSECTION_DISTANCE = 1e-10
+FLOATING_POINT_ERROR_THRESHOLD = 1e-10
 
 
 # TODO: should standardize this interface more -- should guarantee that everything
@@ -24,6 +24,9 @@ class Shape(object):
 
     def get_color_at_point(self, point):
         return self.color
+
+    def ray_originates_inside(self, intersection_point, ray):
+        raise NotImplementedError
 
 
 class Sphere(Shape):
@@ -62,7 +65,7 @@ class Sphere(Shape):
             d2 = (-b - numpy.sqrt(discriminant))/(2*a)
             best_d = None
             for potential_d in (d1, d2):
-                if potential_d < THRESHOLD_INTERSECTION_DISTANCE:
+                if potential_d < FLOATING_POINT_ERROR_THRESHOLD:
                     continue
                 else:
                     best_d = potential_d if best_d is None else min(best_d, potential_d)
@@ -78,6 +81,8 @@ class Sphere(Shape):
         base_surface_normal = normalize(point - self.center)
         return -1*numpy.sign(numpy.dot(base_surface_normal, ray)) * base_surface_normal
 
+    # TODO: this is actually the same for all shapes: if dot(normal, ray) > 0 then
+    # we're inside...
     def ray_originates_inside(self, intersection_point, ray):
         # Note that in this case, the ray ENDS at intersection point
         return numpy.dot(intersection_point - self.center, ray) > 0
@@ -116,7 +121,7 @@ class Plane(Shape):
 
         numerator = numpy.dot(self.center - ray_pos, self.normal)
         d = numerator/denominator
-        return ray_pos + d*ray_dir if d > THRESHOLD_INTERSECTION_DISTANCE else None
+        return ray_pos + d*ray_dir if d > FLOATING_POINT_ERROR_THRESHOLD else None
 
     def build_surface_normal_at_point_for_ray(self, point, ray):
         return -1*numpy.sign(numpy.dot(self.normal, ray)) * self.normal
@@ -138,9 +143,116 @@ class Plane(Shape):
         else:
             return colors.BLACK
 
-    def ray_originates_inside(self, ray):
+    def ray_originates_inside(self, intersection_point, ray):
         # This is a 2-D object and has no inside
         return False
+
+
+class AxisAlignedBox(Shape):
+
+    def __init__(
+        self,
+        center,
+        x_extent,
+        y_extent,
+        z_extent,
+        color,
+        specular=0,
+        transparency=0,
+        index_of_refraction=1
+    ):
+        self.center = center
+        self.color = color
+        self.specular = specular
+        self.transparency = transparency
+        self.index_of_refraction = index_of_refraction
+
+        self.x_range = (center[0] - x_extent/2.0, center[0] + x_extent/2.0)
+        self.y_range = (center[1] - y_extent/2.0, center[1] + y_extent/2.0)
+        self.z_range = (center[2] - z_extent/2.0, center[2] + z_extent/2.0)
+
+    def find_intersection(self, ray_pos, ray_dir):
+        """Basic strategy here is to find where the ray intersects the PLANES
+        of the faces of the box and then determine if the intersection is actually
+        within the box.
+
+        To find the intersections with these planes, we need to find values of d
+        such that ray_pos[i] + d*ray_dir[i] = i_range[j], where i is any
+        coordinate (x, y, z) and j is either 0 or 1 for the min or max value of
+        coordinate i in the box.  Thus d = (i_range[j] - ray_pos[i])/ray_dir[i]
+        """
+        possible_ds = []
+
+        if ray_dir[0] != 0:
+            possible_ds.append((self.x_range[0] - ray_pos[0])/ray_dir[0])
+            possible_ds.append((self.x_range[1] - ray_pos[0])/ray_dir[0])
+
+        if ray_dir[1] != 0:
+            possible_ds.append((self.y_range[0] - ray_pos[1])/ray_dir[1])
+            possible_ds.append((self.y_range[1] - ray_pos[1])/ray_dir[1])
+
+        if ray_dir[2] != 0:
+            possible_ds.append((self.z_range[0] - ray_pos[2])/ray_dir[2])
+            possible_ds.append((self.z_range[1] - ray_pos[2])/ray_dir[2])
+
+        possible_intersections = [ray_pos + d*ray_dir for d in possible_ds]
+
+        best_d = None
+        for possible_d in possible_ds:
+            if (
+                possible_d > FLOATING_POINT_ERROR_THRESHOLD  # TODO: actually need this?
+                and self._is_point_on_box(ray_pos + possible_d*ray_dir)
+            ):
+                if best_d is None:
+                    best_d = possible_d
+                else:
+                    best_d = min(best_d, possible_d)
+
+        if best_d is None:
+            return None
+
+        return ray_pos + best_d*ray_dir
+
+    # TODO: this is actually checking if the point is IN the box...
+    def _is_point_on_box(self, point):
+        return (
+            self.x_range[0] - point[0] < FLOATING_POINT_ERROR_THRESHOLD
+            and point[0] - self.x_range[1] < FLOATING_POINT_ERROR_THRESHOLD
+
+            and self.y_range[0] - point[1] < FLOATING_POINT_ERROR_THRESHOLD
+            and point[1] - self.y_range[1] < FLOATING_POINT_ERROR_THRESHOLD
+
+            and self.z_range[0] - point[2] < FLOATING_POINT_ERROR_THRESHOLD
+            and point[2] - self.z_range[1] < FLOATING_POINT_ERROR_THRESHOLD
+        )
+
+    def _build_surface_normal_at_point(self, point):
+        normal = numpy.array([0,0,0])
+        if numpy.abs(point[0] - self.x_range[0]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[0] = -1
+        if numpy.abs(point[0] - self.x_range[1]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[0] = 1
+
+        if numpy.abs(point[1] - self.y_range[0]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[1] = -1
+        if numpy.abs(point[1] - self.y_range[1]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[1] = 1
+
+        if numpy.abs(point[2] - self.z_range[0]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[2] = -1
+        if numpy.abs(point[2] - self.z_range[1]) < FLOATING_POINT_ERROR_THRESHOLD:
+            normal[2] = 1
+
+        return normalize(normal)
+
+    def build_surface_normal_at_point_for_ray(self, point, ray):
+        base_surface_normal = self._build_surface_normal_at_point(point)
+        return -1*numpy.sign(numpy.dot(base_surface_normal, ray)) * base_surface_normal
+
+    # TODO: find a way around recalculating the surface normal
+    def ray_originates_inside(self, intersection_point, ray):
+        base_surface_normal = self._build_surface_normal_at_point(intersection_point)
+        return numpy.dot(base_surface_normal, ray) > 0
 
 
 class LightSource(object):
