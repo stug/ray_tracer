@@ -33,9 +33,11 @@ complex_scene = Scene(
             color=colors.GREEN,
             specular=0.8
         ),
-        Sphere(
+        AxisAlignedBox(
             center=numpy.array([5,-4,0]),
-            radius=0.5,
+            x_extent=1,
+            y_extent=1,
+            z_extent=1,
             color=colors.MAGENTA,
             specular=0.8
         ),
@@ -136,6 +138,6 @@ box_test = Scene(
 
 
 if __name__ == '__main__':
-    program = RayTracerMain(box_test, 400, 400)
+    program = RayTracerMain(complex_scene, 600, 600)
     program.trace_scene()
     program.export_png('test.png')
