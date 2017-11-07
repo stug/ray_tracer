@@ -3,10 +3,11 @@ import numpy
 import colors
 from main import RayTracerMain
 from scene import Scene
-from shapes import AxisAlignedBox
+from shapes import Box
 from shapes import LightSource
 from shapes import Plane
 from shapes import Sphere
+
 
 complex_scene = Scene(
     position=numpy.array([-13,0,0]),
@@ -33,13 +34,12 @@ complex_scene = Scene(
             color=colors.GREEN,
             specular=0.8
         ),
-        AxisAlignedBox(
+        Box(
             center=numpy.array([5,-4,0]),
-            x_extent=1,
-            y_extent=1,
-            z_extent=1,
+            size=numpy.array([1,1,1]),
             color=colors.MAGENTA,
-            specular=0.8
+            specular=0.8,
+            rotation=numpy.array([1,1,1])
         ),
         Sphere(
             center=numpy.array([8,0,-10]),
@@ -53,6 +53,14 @@ complex_scene = Scene(
             color=colors.WHITE,
             specular=0.2,
             checkered=True
+        ),
+        Box(
+            center=numpy.array([3,0,0]),
+            size=numpy.array([2,2,2]),
+            color=colors.CYAN,
+            transparency=1,
+            index_of_refraction=1.1,
+            rotation=(numpy.pi/4.)*numpy.array([1,1,0]),
         )
     ],
     light_sources=[
@@ -111,33 +119,33 @@ plane_test = Scene(
 )
 
 
-box_test = Scene(
-    position=numpy.array([0,5,5]),
-    direction=numpy.array([15,-5,-5]),
+rotate_box_test = Scene(
+    position=numpy.array([-13,0,0]),
+    direction=numpy.array([1,0,0]),
     background_color=colors.BLACK,
     shapes=[
-        AxisAlignedBox(
-            center=numpy.array([15,0,0]),
-            x_extent=2,
-            y_extent=2,
-            z_extent=2,
-            color=colors.RED,
-            specular=0.5
+        Box(
+            center=numpy.array([5,-4,0]),
+            size=numpy.array([1,1,1]),
+            color=colors.MAGENTA,
+            specular=0.8,
+            rotation=2*numpy.pi*numpy.array([1,0,0])
         ),
         Plane(
             center=numpy.array([0,0,-4]),
             normal=numpy.array([0,0,1]),
             color=colors.WHITE,
+            specular=0.2,
             checkered=True
         )
     ],
     light_sources=[
-        LightSource(numpy.array([0,0,0]))
+        LightSource(numpy.array([0,0,0])),
     ]
 )
 
 
 if __name__ == '__main__':
-    program = RayTracerMain(complex_scene, 600, 600)
+    program = RayTracerMain(complex_scene, 700, 700)
     program.trace_scene()
     program.export_png('test.png')
