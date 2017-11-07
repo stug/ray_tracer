@@ -1,7 +1,10 @@
 import numpy
 
 import colors
+from util import change_basis
 from util import normalize
+from util import rotate
+from util import BASE_BASIS
 from util import X_UNIT_VECTOR
 from util import Z_UNIT_VECTOR
 
@@ -59,7 +62,7 @@ class Sphere(Shape):
                 return None
             else:
                 intersection = ray_pos + d*ray_dir
-                return intersection, self.build_surface_normal(intersection)
+                return intersection
         else:
             d1 = (-b + numpy.sqrt(discriminant))/(2*a)
             d2 = (-b - numpy.sqrt(discriminant))/(2*a)
@@ -148,28 +151,40 @@ class Plane(Shape):
         return False
 
 
-class AxisAlignedBox(Shape):
+class Box(Shape):
 
     def __init__(
         self,
         center,
-        x_extent,
-        y_extent,
-        z_extent,
+        size,
         color,
+        rotation=numpy.array([0,0,0]),
         specular=0,
         transparency=0,
         index_of_refraction=1
     ):
-        self.center = center
         self.color = color
         self.specular = specular
         self.transparency = transparency
         self.index_of_refraction = index_of_refraction
 
+        # create a rotated basis set and a representation of the base basis
+        # vectors in the new basis
+        self.basis = tuple(
+            rotate(basis_vector, rotation) for basis_vector in BASE_BASIS
+        )
+        self.base_basis_in_rotated_basis = tuple(
+            change_basis(basis_vector, self.basis)
+            for basis_vector in BASE_BASIS
+        )
+
+        center = change_basis(center, self.basis)
+
+        (x_extent, y_extent, z_extent) = size
         self.x_range = (center[0] - x_extent/2.0, center[0] + x_extent/2.0)
         self.y_range = (center[1] - y_extent/2.0, center[1] + y_extent/2.0)
         self.z_range = (center[2] - z_extent/2.0, center[2] + z_extent/2.0)
+
 
     def find_intersection(self, ray_pos, ray_dir):
         """Basic strategy here is to find where the ray intersects the PLANES
@@ -181,6 +196,9 @@ class AxisAlignedBox(Shape):
         coordinate (x, y, z) and j is either 0 or 1 for the min or max value of
         coordinate i in the box.  Thus d = (i_range[j] - ray_pos[i])/ray_dir[i]
         """
+        ray_pos = change_basis(ray_pos, self.basis)
+        ray_dir = change_basis(ray_dir, self.basis)
+
         possible_ds = []
 
         if ray_dir[0] != 0:
@@ -211,7 +229,8 @@ class AxisAlignedBox(Shape):
         if best_d is None:
             return None
 
-        return ray_pos + best_d*ray_dir
+        intersection = ray_pos + best_d*ray_dir
+        return change_basis(intersection, self.base_basis_in_rotated_basis)
 
     # TODO: this is actually checking if the point is IN the box...
     def _is_point_on_box(self, point):
@@ -227,6 +246,7 @@ class AxisAlignedBox(Shape):
         )
 
     def _build_surface_normal_at_point(self, point):
+        point = change_basis(point, self.basis)
         normal = numpy.array([0,0,0])
         if numpy.abs(point[0] - self.x_range[0]) < FLOATING_POINT_ERROR_THRESHOLD:
             normal[0] = -1
@@ -243,7 +263,8 @@ class AxisAlignedBox(Shape):
         if numpy.abs(point[2] - self.z_range[1]) < FLOATING_POINT_ERROR_THRESHOLD:
             normal[2] = 1
 
-        return normalize(normal)
+        normal = normalize(normal)
+        return change_basis(normal, self.base_basis_in_rotated_basis)
 
     def build_surface_normal_at_point_for_ray(self, point, ray):
         base_surface_normal = self._build_surface_normal_at_point(point)
